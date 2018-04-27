@@ -1,0 +1,19 @@
+---
+title: "Short MMI Calculation"
+author: "Anna Khazenzon"
+date: "April 27, 2018"
+output: html_notebook
+---
+
+```{r}
+library(tidyverse)
+```
+
+Original data has 63 columns. 
+
+```{r}
+raw_qualtrics <- read.csv('raw_qualtrics_data.csv')
+```
+
+
+
