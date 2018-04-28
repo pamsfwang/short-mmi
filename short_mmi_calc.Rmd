@@ -15,5 +15,103 @@ Original data has 63 columns.
 raw_qualtrics <- read.csv('raw_qualtrics_data.csv')
 ```
 
+Rename and select necessary columns.
 
+Possible data cleaning needed:
+* subid: some start with "ID "
+
+```{r}
+mmi_data <- raw_qualtrics %>%
+  filter(Finished == "True") %>%
+  rename(duration = Duration..in.seconds.,
+         subid = Q104,
+         tot_reading = Q47_1,
+         tot_hw = Q47_2,
+         tot_watching = Q47_3,
+         tot_listening = Q47_4,
+         tot_playing = Q47_5,
+         tot_internet = Q47_6,
+         tot_social = Q47_7,
+         tot_chat = Q47_8,
+         tot_comp = Q47_9,
+         multi_reading_hw = Q76_1,
+         multi_reading_watching = Q76_2,
+         multi_reading_listening = Q76_3,
+         multi_reading_playing = Q76_4,
+         multi_reading_internet = Q76_5,
+         multi_reading_social = Q76_6,
+         multi_reading_chat = Q76_7,
+         multi_reading_comp = Q76_8,
+         multi_hw_watching = Q49_2,
+         multi_hw_listening = Q49_3,
+         multi_hw_playing = Q49_4,
+         multi_hw_internet = Q49_5,
+         multi_hw_social = Q49_6,
+         multi_hw_chat = Q49_7,
+         multi_hw_comp = Q49_8,
+         multi_watching_listening = Q50_3,
+         multi_watching_playing = Q50_4,
+         multi_watching_internet = Q50_5,
+         multi_watching_social = Q50_6,
+         multi_watching_chat = Q50_7,
+         multi_watching_comp = Q50_8,
+         multi_listening_playing = Q51_4,
+         multi_listening_internet = Q51_5,
+         multi_listening_social = Q51_6,
+         multi_listening_chat = Q51_7,
+         multi_listening_comp = Q51_8,
+         multi_playing_internet = Q52_5,
+         multi_playing_social = Q52_6,
+         multi_playing_chat = Q52_7,
+         multi_playing_comp = Q52_8,
+         multi_internet_social = Q53_6,
+         multi_internet_chat = Q53_7,
+         multi_internet_comp = Q53_8,
+         multi_social_chat = Q54_7,
+         multi_social_comp = Q54_8,
+         multi_comp_chat = Q55_8) %>%
+  mutate(subid = factor(gsub(pattern = "ID ", replacement = "", x = subid)),
+         duration = as.numeric(duration)/60) %>%
+  mutate_at(vars(starts_with("tot_")), funs(as.numeric(.))) %>%
+  mutate_at(vars(starts_with("multi_")), funs(recode(.,
+                                                     "Never" = 0,
+                                                     "A little of the time" = 0.33,
+                                                     "Some of the time" = 0.67,
+                                                     "Most of the time" = 1))) %>%
+  select(subid, duration, starts_with("tot_"), starts_with("multi_"))
+
+
+```
+
+Compute totals.
+
+```{r}
+mmi_data %<>%
+  mutate(total_hours = mmi_data %>% select(starts_with("tot_")) %>% rowSums(),
+         multi_reading = mmi_data %>% select(starts_with("multi_")) %>% select(contains("reading")) %>% rowSums(),
+         multi_hw = mmi_data %>% select(starts_with("multi_")) %>% select(contains("hw")) %>% rowSums(),
+         multi_watching = mmi_data %>% select(starts_with("multi_")) %>% select(contains("watching")) %>% rowSums(),
+         multi_listening = mmi_data %>% select(starts_with("multi_")) %>% select(contains("listening")) %>% rowSums(),
+         multi_playing = mmi_data %>% select(starts_with("multi_")) %>% select(contains("playing")) %>% rowSums(),
+         multi_internet = mmi_data %>% select(starts_with("multi_")) %>% select(contains("internet")) %>% rowSums(),
+         multi_social = mmi_data %>% select(starts_with("multi_")) %>% select(contains("social")) %>% rowSums(),
+         multi_chat = mmi_data %>% select(starts_with("multi_")) %>% select(contains("chat")) %>% rowSums(),
+         multi_comp = mmi_data %>% select(starts_with("multi_")) %>% select(contains("comp")) %>% rowSums(),
+         weighted_sum = multi_reading * tot_reading + 
+           multi_hw * tot_hw +
+           multi_watching * tot_watching +
+           multi_listening * tot_listening +
+           multi_playing * tot_playing +
+           multi_internet * tot_internet +
+           multi_social * tot_social +
+           multi_chat * tot_chat +
+           multi_comp * tot_comp,
+         mmi = weighted_sum / total_hours) %>%
+  select(subid, mmi, total_hours, duration, everything())
+  
+```
+
+```{r}
+mmi_data
+```
 
