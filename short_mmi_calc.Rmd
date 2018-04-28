@@ -71,7 +71,7 @@ mmi_data <- raw_qualtrics %>%
          multi_social_comp = Q54_8,
          multi_comp_chat = Q55_8) %>%
   mutate(subid = factor(gsub(pattern = "ID ", replacement = "", x = subid)),
-         duration = as.numeric(duration)/60) %>%
+         duration = as.numeric(as.character(duration))/60) %>%
   mutate_at(vars(starts_with("tot_")), funs(as.numeric(.))) %>%
   mutate_at(vars(starts_with("multi_")), funs(recode(.,
                                                      "Never" = 0,
