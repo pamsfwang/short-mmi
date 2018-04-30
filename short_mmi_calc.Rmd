@@ -14,7 +14,7 @@ library(tidyverse)
 plotformat=theme(title= element_text(face="bold",size=17),axis.title = element_text(face="bold",size=15),axis.text.x = element_text(size=14),axis.text.y = element_text(size=14))+theme_bw()
 ```
 
-#Step01: read in qualtrics raw data 
+#Step01: read in qualtrics raw data   
 Original data has 63 columns. 
 
 ```{r}
@@ -22,8 +22,8 @@ Original data has 63 columns.
 raw_qualtrics <- read.csv('raw_qualtrics_data.csv')
 ```
 
-#Step02: rename and select necessary columns.
-Possible data cleaning needed:
+#Step02: rename and select necessary columns  
+Possible data cleaning needed:  
 * subid: some start with "ID "
 
 ```{r}
@@ -89,7 +89,7 @@ mmi_data <- raw_qualtrics %>%
 
 ```
 
-#Step03: compute totals.
+#Step03: compute totals  
 ```{r}
 mmi_data %<>%
   mutate(total_hours = mmi_data %>% select(starts_with("tot_")) %>% rowSums(),
@@ -116,12 +116,12 @@ mmi_data %<>%
   
 ```
 
-#Step04: check results
+#Step04: check results  
 ```{r}
 head(mmi_data)
 ```
 
-Plot out the results
+Plot out the results  
 ```{r}
 ggplot(mmi_data,aes(mmi_data$mmi))+
   geom_histogram(breaks = seq(1,5,by=.2),
