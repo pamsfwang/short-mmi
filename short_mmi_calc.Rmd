@@ -9,14 +9,20 @@ output: html_notebook
 library(tidyverse)
 ```
 
+
+```{r}
+plotformat=theme(title= element_text(face="bold",size=17),axis.title = element_text(face="bold",size=15),axis.text.x = element_text(size=14),axis.text.y = element_text(size=14))+theme_bw()
+```
+
+#Step01: read in qualtrics raw data 
 Original data has 63 columns. 
 
 ```{r}
+#read mmi raw data from qualtrics
 raw_qualtrics <- read.csv('raw_qualtrics_data.csv')
 ```
 
-Rename and select necessary columns.
-
+#Step02: rename and select necessary columns.
 Possible data cleaning needed:
 * subid: some start with "ID "
 
@@ -83,8 +89,7 @@ mmi_data <- raw_qualtrics %>%
 
 ```
 
-Compute totals.
-
+#Step03: compute totals.
 ```{r}
 mmi_data %<>%
   mutate(total_hours = mmi_data %>% select(starts_with("tot_")) %>% rowSums(),
@@ -111,7 +116,19 @@ mmi_data %<>%
   
 ```
 
+#Step04: check results
 ```{r}
-mmi_data
+head(mmi_data)
 ```
 
+Plot out the results
+```{r}
+ggplot(mmi_data,aes(mmi_data$mmi))+
+  geom_histogram(breaks = seq(1,5,by=.2),
+                 aes(fill=..count..),
+                 alpha = .7)+
+  labs(title = "MMI score histogram")+
+  labs(x = "MMI score", y = "count")+
+  geom_density()+
+  plotformat
+```
